@@ -2,6 +2,7 @@ package com.nineinfosys.android.geniusnineforums;
 
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 /**
@@ -10,9 +11,11 @@ import android.widget.TextView;
 
 public class ForumViewHolder extends RecyclerView.ViewHolder {
     View view;
+    ImageButton imageButtonForumComment;
     public ForumViewHolder(View itemView) {
         super(itemView);
         view = itemView;
+        imageButtonForumComment = (ImageButton)view.findViewById(R.id.imageButtonForumComment);
     }
     public void setTitle(String title){
         TextView textViewForumTitle = (TextView)view.findViewById(R.id.textViewForumTitle);

@@ -9,10 +9,15 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Toast;
 
 import com.facebook.login.LoginManager;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
@@ -33,6 +38,7 @@ public class MainActivity extends AppCompatActivity {
 
         authenticate();
         databaseReferenceForums = FirebaseDatabase.getInstance().getReference().child(getString(R.string.app_id)).child("Forum");
+
         forumRecyclerView = (RecyclerView)findViewById(R.id.recyclerViewForum);
         forumRecyclerView.setHasFixedSize(true);
         forumRecyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -101,9 +107,19 @@ public class MainActivity extends AppCompatActivity {
                 (Forum.class, R.layout.forum_row, ForumViewHolder.class, databaseReferenceForums) {
             @Override
             protected void populateViewHolder(ForumViewHolder viewHolder, Forum model, int position) {
+                final String post_key = getRef(position).getKey();
                 viewHolder.setTitle(model.getTitle());
                 viewHolder.setContent(model.getContent());
                 viewHolder.setUserID(model.getUserId());
+                viewHolder.imageButtonForumComment.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent intent = new Intent(MainActivity.this, AddComment.class);
+                        intent.putExtra("forumPostID", post_key );
+                        startActivity(intent);
+                    }
+                });
+
 
             }
         };
