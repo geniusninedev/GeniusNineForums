@@ -45,6 +45,7 @@ public class MainActivity extends AppCompatActivity {
         forumRecyclerView = (RecyclerView)findViewById(R.id.recyclerViewForum);
         forumRecyclerView.setHasFixedSize(true);
         forumRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        populateRecyclerView();
     }
     private void authenticate(){
         firebaseAuth = FirebaseAuth.getInstance();
@@ -72,7 +73,7 @@ public class MainActivity extends AppCompatActivity {
         super.onStart();
         Log.e("MainActivity:", "Starting auth listener");
         firebaseAuth.addAuthStateListener(firebaseAuthListner);
-        populateRecyclerView();
+
 
 
 
