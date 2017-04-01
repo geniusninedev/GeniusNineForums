@@ -30,6 +30,8 @@ public class MainActivity extends AppCompatActivity {
     private DatabaseReference databaseReferenceForums;
 
     private RecyclerView forumRecyclerView;
+    private long children;
+    private boolean likeStatus;
 
 
 
@@ -38,14 +40,18 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        authenticate();
-        databaseReferenceForums = FirebaseDatabase.getInstance().getReference().child(getString(R.string.app_id)).child("Forum");
 
+        databaseReferenceForums = FirebaseDatabase.getInstance().getReference().child(getString(R.string.app_id)).child("Forum");
+        children = 0;
+        likeStatus = false;
+        authenticate();
+        firebaseAuth.addAuthStateListener(firebaseAuthListner);
 
         forumRecyclerView = (RecyclerView)findViewById(R.id.recyclerViewForum);
         forumRecyclerView.setHasFixedSize(true);
         forumRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         populateRecyclerView();
+
     }
     private void authenticate(){
         firebaseAuth = FirebaseAuth.getInstance();
@@ -72,7 +78,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
         Log.e("MainActivity:", "Starting auth listener");
-        firebaseAuth.addAuthStateListener(firebaseAuthListner);
 
 
 
@@ -112,6 +117,8 @@ public class MainActivity extends AppCompatActivity {
             @Override
             protected void populateViewHolder(ForumViewHolder viewHolder, Forum model, int position) {
                 final String post_key = getRef(position).getKey();
+
+                Log.e("-------", post_key);
                 viewHolder.setTitle(model.getTitle());
                 viewHolder.setContent(model.getContent());
                 viewHolder.setUserID(model.getUserId());
@@ -125,8 +132,10 @@ public class MainActivity extends AppCompatActivity {
                 });
                 if(showLikeStatus(post_key)){
                     viewHolder.setLikeStatus(getTotalChildren(post_key)+ " likes...and "+"You also have Liked post");
+                    Log.e("-------", post_key +"  set for ");
                 }else{
                     viewHolder.setLikeStatus(getTotalChildren(post_key)+" likes...and "+"You have not Liked post");
+                    Log.e("-------", post_key +"  set for ");
                 }
                 viewHolder.forumLikeButton.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -149,7 +158,7 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    boolean likeStatus;
+
     private boolean showLikeStatus(String post_key){
 
         DatabaseReference databaseReferenceForumsLikes = databaseReferenceForums.child(post_key).child("Likes");
@@ -173,7 +182,7 @@ public class MainActivity extends AppCompatActivity {
         return likeStatus;
 
     }
-    long children;
+
     private long getTotalChildren(String post_key){
         DatabaseReference databaseReferenceForumsLikes = databaseReferenceForums.child(post_key).child("Likes");
         final String user_id = firebaseAuth.getCurrentUser().getUid();
