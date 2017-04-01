@@ -20,6 +20,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -27,6 +28,7 @@ public class MainActivity extends AppCompatActivity {
     private FirebaseAuth firebaseAuth;
     private FirebaseAuth.AuthStateListener firebaseAuthListner;
     private DatabaseReference databaseReferenceForums;
+
     private RecyclerView forumRecyclerView;
 
 
@@ -38,6 +40,7 @@ public class MainActivity extends AppCompatActivity {
 
         authenticate();
         databaseReferenceForums = FirebaseDatabase.getInstance().getReference().child(getString(R.string.app_id)).child("Forum");
+
 
         forumRecyclerView = (RecyclerView)findViewById(R.id.recyclerViewForum);
         forumRecyclerView.setHasFixedSize(true);
@@ -119,11 +122,71 @@ public class MainActivity extends AppCompatActivity {
                         startActivity(intent);
                     }
                 });
+                if(showLikeStatus(post_key)){
+                    viewHolder.setLikeStatus(getTotalChildren(post_key)+ " likes...and "+"You also have Liked post");
+                }else{
+                    viewHolder.setLikeStatus(getTotalChildren(post_key)+" likes...and "+"You have not Liked post");
+                }
+                viewHolder.forumLikeButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        final String user_id = firebaseAuth.getCurrentUser().getUid();
+                        if(showLikeStatus(post_key)){
+                            databaseReferenceForums.child(post_key).child("Likes").child(user_id).removeValue();
+
+                        }else{
+                            databaseReferenceForums.child(post_key).child("Likes").child(user_id).setValue("Liked");
+                        }
+                    }
+                });
+
 
 
             }
         };
         forumRecyclerView.setAdapter(firebaseRecyclerAdapter);
 
+    }
+
+    boolean likeStatus;
+    private boolean showLikeStatus(String post_key){
+
+        DatabaseReference databaseReferenceForumsLikes = databaseReferenceForums.child(post_key).child("Likes");
+        final String user_id = firebaseAuth.getCurrentUser().getUid();
+        databaseReferenceForumsLikes.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if(!dataSnapshot.hasChild(user_id)){
+                    likeStatus = false;
+                }
+                else{
+                    likeStatus = true;
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+        return likeStatus;
+
+    }
+    long children;
+    private long getTotalChildren(String post_key){
+        DatabaseReference databaseReferenceForumsLikes = databaseReferenceForums.child(post_key).child("Likes");
+        final String user_id = firebaseAuth.getCurrentUser().getUid();
+        databaseReferenceForumsLikes.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+               children =  dataSnapshot.getChildrenCount();
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+        return children;
     }
 }

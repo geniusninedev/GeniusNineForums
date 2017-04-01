@@ -25,15 +25,32 @@
 
     <LinearLayout
         android:orientation="horizontal"
-        android:layout_width="30dp"
+        android:layout_width="wrap_content"
         android:layout_height="match_parent">
 
         <ImageButton
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:srcCompat="@mipmap/ic_comment_white_24dp"
             android:id="@+id/imageButtonForumComment"
+            android:layout_weight="1"
+
+           />
+
+        <Button
+            android:text="Like"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/buttonForumLike"
             android:layout_weight="1" />
+
     </LinearLayout>
+
+    <TextView
+        android:text=""
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/textViewLike"
+        android:layout_weight="1" />
 
 </LinearLayout>
